@@ -9,6 +9,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class ConfigBase(BaseSettings):
     GEMINI_API_KEY: str = "AIzaSyD0VoslJi9534QVk8Dvkmm0dl4tm8K3lLw"
 
+    # RSSHUB
+    RSSHUB_URL: str = "http://127.0.0.1:1200"
     # TOKEN
     SECRET_KEY: str = "a035e292-1b1f-4105-b477-302769c78a1f"
     ACCESS_TOKEN_EXPIRES: int = 30

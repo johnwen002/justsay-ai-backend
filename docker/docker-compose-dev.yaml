@@ -1,0 +1,95 @@
+services:
+  avatar:
+    image: dicebear/api:2
+    restart: always
+    tmpfs:
+      - "/run"
+      - "/tmp"
+    ports:
+      - 3000:3000
+    networks:
+      - app_network
+  db:
+    image: postgres:17.4
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${PGDATA:-/var/lib/postgresql/data/pgdata}
+    command: >
+      postgres -c 'max_connections=${POSTGRES_MAX_CONNECTIONS:-100}'
+               -c 'shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}'
+               -c 'work_mem=${POSTGRES_WORK_MEM:-4MB}'
+               -c 'maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-64MB}'
+               -c 'effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-4096MB}'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - app_network
+  rsshub:
+    # two ways to enable puppeteer:
+    # * comment out marked lines, then use this image instead: diygod/rsshub:chromium-bundled
+    # * (consumes more disk space and memory) leave everything unchanged
+    image: diygod/rsshub
+    pull_policy: always
+    restart: always
+    ports:
+      - "1200:1200"
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: "redis://redis:6379/"
+      PUPPETEER_WS_ENDPOINT: "ws://browserless:3000" # marked
+      TWITTER_USERNAME: "fwttyuu"
+      TWITTER_PASSWORD: "fwttyuu@twitter7"
+      TWITTER_PHONE_OR_EMAIL: "jacksonwen001@gmail.com"
+      TWITTER_AUTHENTICATION_SECRET: "2NGLYBSQZSE42X3P"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - redis
+      - browserless # marked
+    networks:
+      - app_network
+
+  browserless: # marked
+    image: browserless/chrome # marked
+    restart: always # marked
+    ulimits: # marked
+      core: # marked
+        hard: 0 # marked
+        soft: 0 # marked
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - app_network
+
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - app_network
+networks:
+  app_network:
+    driver: bridge
+volumes:
+  redis-data:
+  pgdata:
