@@ -1,6 +1,6 @@
-def main():
-    print("Hello from justsay-ai-backend!")
+from fastapi import FastAPI
+
+app = FastAPI()
 
 
-if __name__ == "__main__":
-    main()
+from src.routes import *  # noqa
