@@ -1,0 +1,14 @@
+[project]
+name = "justsay-ai-backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "alembic>=1.15.2",
+    "fastapi[standard]>=0.115.12",
+    "litellm>=1.69.2",
+    "qdrant-client>=1.14.2",
+    "sqlalchemy[postgresql-asyncpg]>=2.0.41",
+    "sqlmodel>=0.0.24",
+]
