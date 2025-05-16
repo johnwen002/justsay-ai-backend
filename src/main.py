@@ -5,7 +5,6 @@ from loguru import logger
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.events.rss import get_rss_schedule
-from src.initial.x_user_init import initial_test
 from src.libs.db_session import get_session
 from src.tasks.scheduler import initialize
 
@@ -19,9 +18,9 @@ async def lifepan(app: FastAPI):
     session: AsyncSession = None
     try:
         session = await anext(get_session(False))
-        await initialize(session)  # 创建任务
-        await initial_test(session)
-        await get_rss_schedule(session)  # 应用启动立即执行任务
+        # await initialize(session)  # 创建任务
+        # await initial_test(session)
+        # await get_rss_schedule(session)  # 应用启动立即执行任务
 
     except Exception as e:
         logger.error(f"start application error: {e}")

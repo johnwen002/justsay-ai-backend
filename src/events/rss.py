@@ -54,6 +54,7 @@ async def get_rss(path: str):
             return []
 
         items = channel.findall("item")
+        
         return [
             {
                 "title": item.find("title").text,
@@ -82,12 +83,14 @@ async def get_rss_schedule(session: AsyncSession):
         results.extend(result)
         if "twiiter" in rss_path:
             await asyncio.sleep(10)
-    logger.info(results)
-    stmt = (
-        insert(RSSInfomation)
-        .values(results)
-        .on_conflict_do_nothing(index_elements=["title"])
-    )
 
-    await session.exec(stmt)
-    await session.commit()
+    logger.info(results)
+    if results:
+        stmt = (
+            insert(RSSInfomation)
+            .values(results)
+            .on_conflict_do_nothing(index_elements=["title"])
+        )
+
+        await session.exec(stmt)
+        await session.commit()

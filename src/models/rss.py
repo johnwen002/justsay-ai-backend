@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from sqlmodel import Field
 
 from src.models.base import BaseSQLModel
@@ -12,4 +13,4 @@ class RSSInfomation(BaseSQLModel, table=True):
     guid: str = Field(nullable=True)
     pub_date: datetime = Field(nullable=True)
     author: str = Field(nullable=True)
-    rss_path: str = Field(nullable=False)
+    rss_path: str = Field(nullable=False, index=True)

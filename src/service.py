@@ -39,8 +39,8 @@ class BaseService:
         *,
         model: ModelType,
         query: Select[T] | None = None,
-        page: int = 0,
-        page_size: int = 20,
+        page: int = None,
+        page_size: int = None,
         sort_type: SortType = None,
         sort_field: Any = None,
     ):
@@ -62,8 +62,9 @@ class BaseService:
         count = (
             await self.session.exec(select(func.count()).select_from(stmt.subquery()))
         ).one()
-
-        stmt = stmt.offset(page * page_size).limit(page_size)
+        if page and page_size is not None:
+            stmt = stmt.offset(page * page_size).limit(page_size)
+            
         if sort_type is not None and sort_field is not None:
             if sort_type == "desc":
                 stmt = stmt.order_by(desc(sort_field))

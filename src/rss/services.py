@@ -1,12 +1,29 @@
+from datetime import date, datetime, time
+
 from sqlalchemy.dialects.postgresql import insert
-from sqlmodel import select
+from sqlmodel import and_, select
 
 from src.models.follow import FollowRSSPath
+from src.models.rss import RSSInfomation
 from src.rss.schema import FollowRSSPathSchema
 from src.service import BaseService
 
 
 class RSSService(BaseService):
+    async def get_rss(self, *, rss_path: str):
+        today_date: date = date.today()  # 1. 获取今天的日期
+
+        return await self.search(
+            model=RSSInfomation,
+            query=select(RSSInfomation).where(
+                and_(
+                    RSSInfomation.rss_path == rss_path,
+                    RSSInfomation.pub_date >= datetime.combine(today_date, time.min),
+                    RSSInfomation.pub_date <= datetime.combine(today_date, time.max),
+                )
+            ),
+        )
+
     async def add(self, *, schema: FollowRSSPathSchema):
         await self.create(db_obj=FollowRSSPath(**schema.model_dump()))
 
